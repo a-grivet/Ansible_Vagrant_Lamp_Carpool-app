@@ -1,0 +1,27 @@
+---
+- name: Common configuration and firewall on all hosts
+  hosts: all
+  become: true
+  roles:
+    - role: common
+      tags:
+        - common  
+    - role: firewall
+      tags:
+        - firewall
+
+- name: Database server configuration
+  hosts: db
+  become: true
+  roles:
+    - role: db
+      tags:
+        - db       
+
+- name: Web server configuration
+  hosts: web
+  become: true
+  roles:
+    - role: web
+      tags:
+        - web      

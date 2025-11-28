@@ -1,0 +1,5 @@
+---
+- name: Reload nftables
+  ansible.builtin.command: nft -f {{ nftables_config_path }}
+  tags:
+  - service

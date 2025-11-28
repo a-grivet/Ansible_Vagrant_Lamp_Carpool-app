@@ -1,0 +1,40 @@
+---
+- name: Update APT cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags:
+    - bootstrap       
+
+- name: Install common packages
+  apt:
+    name: "{{ common_packages }}"
+    state: present
+  tags:
+    - bootstrap       
+
+- name: Set timezone
+  timezone:
+    name: "{{ common_timezone }}"
+  tags:
+    - config    
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags:
+    - bootstrap      
+
+- name: Install common packages
+  apt:
+    name: "{{ common_packages }}"
+    state: present
+  tags:
+    - bootstrap      
+
+- name: Set timezone
+  timezone:
+    name: "{{ common_timezone }}"
+  tags:
+    - config 

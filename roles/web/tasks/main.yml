@@ -1,0 +1,103 @@
+---
+- name: Install Apache and PHP
+  ansible.builtin.apt:
+    name: "{{ apache_packages + php_packages }}"
+    state: present
+    update_cache: yes
+  tags:
+  - install
+
+- name: Enable PHP Apache module
+  ansible.builtin.command:
+    cmd: a2enmod php8.3
+    creates: /etc/apache2/mods-enabled/php8.3.load
+  tags:
+  - install
+  - config
+
+- name: Disable default site
+  ansible.builtin.command: a2dissite 000-default.conf
+  register: disable_default
+  changed_when: "'already disabled' not in disable_default.stdout"
+  tags:
+  - vhost
+  - config
+
+- name: Deploy virtualhost config
+  ansible.builtin.template:
+    src: vhost.conf.j2
+    dest: /etc/apache2/sites-available/webapp.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Apache
+  tags:
+  - vhost
+  - config
+
+- name: Enable webapp site
+  ansible.builtin.command: a2ensite webapp.conf
+  register: enablesite
+  changed_when: "'Enabling site webapp' in enablesite.stdout"
+  notify: Reload Apache
+  tags:
+  - vhost
+  - config
+
+- name: Ensure document root exists
+  ansible.builtin.file:
+    path: "{{ web_document_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Remove default Apache index.html if present
+  ansible.builtin.file:
+    path: "{{ web_document_root }}/index.html"
+    state: absent
+  tags:
+  - vhost
+  - config
+
+- name: Clone application repo
+  ansible.builtin.git:
+    repo: "{{ web_repo_url }}"
+    dest: "{{ web_repo_dest }}"
+    version: "{{ web_repo_version }}"
+    force: yes
+  tags:
+  - deploy-code
+
+- name: Copy PHP files to document root
+  ansible.builtin.copy:
+    src: "{{ web_repo_dest }}/{{ item }}"
+    dest: "{{ web_document_root }}/{{ item }}"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+    remote_src: yes
+  loop:
+    - index.php
+    - config.php
+  tags:
+  - deploy-code
+
+- name: Copy CSS file to document root
+  ansible.builtin.copy:
+    src: "{{ web_repo_dest }}/style.css"
+    dest: "{{ web_document_root }}/style.css"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+    remote_src: yes
+  tags:
+  - deploy-code
+
+- name: Ensure Apache is started and enabled
+  ansible.builtin.service:
+    name: apache2
+    state: started
+    enabled: yes
+  tags:
+  - service

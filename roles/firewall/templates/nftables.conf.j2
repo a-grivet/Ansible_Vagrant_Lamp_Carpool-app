@@ -1,0 +1,38 @@
+table inet filter {
+  chain input {
+    type filter hook input priority 0;
+    policy drop;
+
+    # Loopback
+    iif lo accept
+
+    # Trafic enabled
+    ct state established,related accept
+
+    # SSH
+    tcp dport {{ nft_ssh_port }} accept
+
+    # HTTP/HTTPS sur le webserver
+    {% if 'web' in group_names and nft_allow_http %}
+    tcp dport 80 accept
+    {% endif %}
+    {% if 'web' in group_names and nft_allow_https %}
+    tcp dport 443 accept
+    {% endif %}
+
+    # MariaDB from web server to db server
+    {% if 'db' in group_names and nft_allow_mariadb %}
+    ip saddr {{ nft_mariadb_allowed_ip }} tcp dport {{ nft_mariadb_port }} accept
+    {% endif %}
+  }
+
+  chain forward {
+    type filter hook forward priority 0;
+    policy drop;
+  }
+
+  chain output {
+    type filter hook output priority 0;
+    policy accept;
+  }
+}

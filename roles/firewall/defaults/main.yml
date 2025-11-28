@@ -1,0 +1,13 @@
+---
+nftables_packages:
+  - nftables
+
+nftables_config_path: /etc/nftables.conf
+
+nft_ssh_port: 22
+nft_mariadb_port: 3306
+nft_mariadb_allowed_ip: "192.168.56.111"  # IP web-srv
+
+nft_allow_http: "{{ 'web' in group_names }}"
+nft_allow_https: "{{ 'web' in group_names }}"
+nft_allow_mariadb: "{{ 'db' in group_names }}"

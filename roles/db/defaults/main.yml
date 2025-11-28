@@ -1,0 +1,17 @@
+---
+mariadb_packages:
+  - mariadb-server
+  - mariadb-client
+  - python3-pymysql
+
+mariadb_bind_address: "0.0.0.0"
+
+# consistent with config.php
+mariadb_app_db: "covoit"
+mariadb_app_user: "covoit_user"
+mariadb_app_password: "motdepasse"
+
+db_repo_url: "https://github.com/a-grivet/App_Carpooling.git"
+db_repo_version: "main"
+db_repo_dest: "/opt/covoiturage_db_repo"
+db_sql_file_relpath: "schema.sql"

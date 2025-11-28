@@ -1,0 +1,24 @@
+---
+apache_packages:
+  - apache2
+
+php_packages:
+  - php
+  - libapache2-mod-php
+  - php-mysql
+  - php-cli
+  - php-common
+
+web_document_root: "/var/www/html"
+web_server_name: "covoiturage.local"
+
+# Repo Git with PHP/CSS files
+web_repo_url: "https://github.com/a-grivet/App_Carpooling.git"
+web_repo_version: "main"
+web_repo_dest: "/opt/app_web_repo"
+
+# Connexion parameters to the DB 
+web_db_host: "192.168.56.112"
+web_db_name: "appdb"
+web_db_user: "appuser"
+web_db_password: "apppassword"
